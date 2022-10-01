@@ -30,7 +30,7 @@ def write_docfile_content(data, path):
         f.seek(0)
         f.write(data)
 
-def create_doc(file_dir, file_name, export_dir):
+def export_doc(file_dir, file_name, export_dir):
     """Exports unpacked and modified odt folder to valid odt file."""
     try:
         shutil.make_archive(export_dir+file_name, "zip", file_dir)
@@ -47,7 +47,7 @@ def export_pdf(odt_export_dir, pdf_export_dir):
                 --outdir {pdf_export_dir} \
                 {odt_export_dir}*.odt')
 
-def create_temp_dir(temp_dir, template_path):
+def make_temp_dir(temp_dir, template_path):
     """Creates temp directory and generates necessary data."""
     ##########
     if not os.path.isdir(temp_dir):
@@ -64,34 +64,38 @@ def create_temp_dir(temp_dir, template_path):
     shutil.unpack_archive(f"{temp_dir}/template.zip", f"{temp_dir}/template")
     shutil.copy(f"{temp_dir}/template/content.xml", f"{temp_dir}")
 
-def get_imp_paths():
+def get_imp_paths(data_dir):
     """Returns CSV and ODT file path from data dir."""
     from glob import glob as g
     try:
-        datasheet_path = g("data/*.csv")[0]
-        template_path = g("data/*.odt")[0]
+        datasheet_path = g(f"{data_dir}/*.csv")[0]
+        template_path = g(f"{data_dir}/*.odt")[0]
     except IndexError:
         datasheet_path = input("Enter CSV path:")
-        template_path = input("Enter ODT path:")
+        template_path = input("Enter template ODT path:")
     
     return datasheet_path, template_path
 
 def generate_doc(data_sheet, template_file_content, content_dir, odt_export_dir):
+    """Generates valid ODT files from CSV data and template."""
     for row in data_sheet:
         modified_data = modify_docfile_content(row, template_file_content)
         write_docfile_content(modified_data, content_dir+"/content.xml")
-        create_doc(content_dir, row['file_name'], odt_export_dir)
+        export_doc(content_dir, row['file_name'], odt_export_dir)
 
 def clean_up_dirs(*dirs):
     """Deletes given directory recursively."""
     for dir in dirs:
+        print(f"Deleting: {dir}")
         shutil.rmtree(dir)
 
 def main():
+
     # read only user input paths
     temp_dir = "temp/"
     export_dir = "export/"
-    datasheet_path, template_path = get_imp_paths()
+    data_dir = "data/"
+    datasheet_path, template_path = get_imp_paths(data_dir)
     
     # for internal use
     odt_export_dir = export_dir+"odt/"
@@ -99,12 +103,14 @@ def main():
     content_dir = f"{temp_dir}/template/"
     content_path = f"{temp_dir}/content.xml"
     
-    create_temp_dir(temp_dir, template_path)
+    # basically find, replace, export
+    make_temp_dir(temp_dir, template_path)
     data_sheet = read_placeholder_data(datasheet_path)
     template_file_content = read_docfile_template_content(content_path)
     generate_doc(data_sheet, template_file_content, content_dir, odt_export_dir)
     export_pdf(odt_export_dir, pdf_export_dir)
 
+    # delete unwanted dirs
     clean_up_dirs(temp_dir, odt_export_dir)
             
 
