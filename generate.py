@@ -45,7 +45,7 @@ def export_pdf(odt_export_dir, pdf_export_dir):
                 --headless \
                 --convert-to pdf \
                 --outdir {pdf_export_dir} \
-                {odt_export_dir}*.odt')
+                {odt_export_dir}/*.odt')
 
 def make_temp_dir(temp_dir, template_path):
     """Creates temp directory and generates necessary data."""
