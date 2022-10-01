@@ -1,5 +1,4 @@
 import csv
-from msilib.schema import File
 import os
 import shutil
 from pprint import pprint as pp #Pretty print.
