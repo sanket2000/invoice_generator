@@ -17,3 +17,5 @@ Step3: Create a .csv file with place-holder vales as headers.
 Step4: Put replacement value under header rows.
 
 Step5: Place .csv and .odt file into 'data' folder
+
+Step6: Run generate.py
