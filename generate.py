@@ -4,6 +4,9 @@ import shutil
 from pprint import pprint as pp #Pretty print.
 
 
+# If soffice is not added to path
+SOFFICE_PATH = "C:/Program Files/LibreOffice/program/soffice"
+
 def read_placeholder_data(path):
     """Reads values to put into invoice."""
     with open(path) as csv_file:
@@ -41,7 +44,7 @@ def export_doc(file_dir, file_name, export_dir):
 
 def export_pdf(odt_export_dir, pdf_export_dir):
     """Uses soffice cmd args to export odt to pdf."""
-    os.system(f'"C:/Program Files/LibreOffice/program/soffice" \
+    os.system(f'{SOFFICE_PATH} \
                 --headless \
                 --convert-to pdf \
                 --outdir {pdf_export_dir} \
@@ -64,17 +67,16 @@ def make_temp_dir(temp_dir, template_path):
     shutil.unpack_archive(f"{temp_dir}/template.zip", f"{temp_dir}/template")
     shutil.copy(f"{temp_dir}/template/content.xml", f"{temp_dir}")
 
-def get_imp_paths(data_dir):
+def get_imp_paths(data_dir, *extensions):
     """Returns CSV and ODT file path from data dir."""
     from glob import glob as g
-    try:
-        datasheet_path = g(f"{data_dir}/*.csv")[0]
-        template_path = g(f"{data_dir}/*.odt")[0]
-    except IndexError:
-        datasheet_path = input("Enter CSV path:")
-        template_path = input("Enter template ODT path:")
-    
-    return datasheet_path, template_path
+    path_list = tuple()
+    for extn in extensions:
+        try:
+            path_list.append(g(f"{data_dir}/*.{extn}")[0])
+        except IndexError:
+            path_list.append(input(f"Enter .{extn} path:"))
+    return path_list
 
 def generate_doc(data_sheet, template_file_content, content_dir, odt_export_dir):
     """Generates valid ODT files from CSV data and template."""
@@ -92,12 +94,12 @@ def clean_up_dirs(*dirs):
 def main():
 
     # read only user input paths
-    temp_dir = "temp/"
-    export_dir = "export/"
-    data_dir = "data/"
-    datasheet_path, template_path = get_imp_paths(data_dir)
+    data_dir = "data/"          # data_dir where .csv data and .odt template is placed
+    export_dir = "export/"      # export_dir where .pdf will be exported
+    temp_dir = "temp/"          # temp_dir will be generated and deleted
     
     # for internal use
+    datasheet_path, template_path = get_imp_paths(data_dir, "csv", "odt")
     odt_export_dir = export_dir+"odt/"
     pdf_export_dir = export_dir
     content_dir = f"{temp_dir}/template/"
@@ -120,7 +122,7 @@ Hello,
 
 Note: This program assumes you have python3.6 or later
 
-With this program you can generate pdf files from .csv data and .odt template file.
+With this program you can generate .pdf files from .csv data and .odt template file.
 
 Step1: Create a formated .odt file as template.
 Step2: Put place-holder values in template file to be replaced.

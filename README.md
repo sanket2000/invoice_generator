@@ -1,8 +1,10 @@
 Hello,
 
-Note: This program assumes you have python3.6 or later
+Note: This program assumes you have python3.6 or later and Libre office installed.
 
-With this program you can generate pdf files from .csv data and .odt template file.
+With this program you can generate multiple pdf files from .csv data and .odt template file.
+
+Basically, find text (csv column header) in .odt template, replace it with data in .csv row and export to pdf.
 
 
 
