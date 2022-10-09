@@ -33,6 +33,13 @@ def write_docfile_content(data, path):
         f.seek(0)
         f.write(data)
 
+def generate_doc(data_sheet, template_file_content, content_dir, odt_export_dir):
+    """Generates valid ODT files from CSV data and template."""
+    for row in data_sheet:
+        modified_data = modify_docfile_content(row, template_file_content)
+        write_docfile_content(modified_data, content_dir+"/content.xml")
+        export_doc(content_dir, row['file_name'], odt_export_dir)
+
 def export_doc(file_dir, file_name, export_dir):
     """Exports unpacked and modified odt folder to valid odt file."""
     try:
@@ -78,13 +85,6 @@ def get_imp_paths(data_dir, *extensions):
             path_list.append(input(f"Enter .{extn} path:"))
     return path_list
 
-def generate_doc(data_sheet, template_file_content, content_dir, odt_export_dir):
-    """Generates valid ODT files from CSV data and template."""
-    for row in data_sheet:
-        modified_data = modify_docfile_content(row, template_file_content)
-        write_docfile_content(modified_data, content_dir+"/content.xml")
-        export_doc(content_dir, row['file_name'], odt_export_dir)
-
 def clean_up_dirs(*dirs):
     """Deletes given directory recursively."""
     for dir in dirs:
@@ -104,9 +104,9 @@ def main():
     pdf_export_dir = export_dir
     content_dir = f"{temp_dir}/template/"
     content_path = f"{temp_dir}/content.xml"
+    make_temp_dir(temp_dir, template_path)
     
     # basically find, replace, export
-    make_temp_dir(temp_dir, template_path)
     data_sheet = read_placeholder_data(datasheet_path)
     template_file_content = read_docfile_template_content(content_path)
     generate_doc(data_sheet, template_file_content, content_dir, odt_export_dir)
